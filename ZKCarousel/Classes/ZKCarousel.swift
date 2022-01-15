@@ -9,7 +9,7 @@
 import UIKit
 
 @objc public protocol ZKCarouselDelegate: AnyObject {
-    func carouselDidScroll()
+    func carouselDidScroll(currentIndex: Int)
 }
 
 final public class ZKCarousel: UIView,
@@ -21,6 +21,7 @@ final public class ZKCarousel: UIView,
     private var timer: Timer = Timer()
     public var interval: Double = 1.0
     public var delegate: ZKCarouselDelegate?
+    var currentIndex: Int = 0
     
     public var slides: [ZKCarouselSlide] = [] {
         didSet {
@@ -107,6 +108,7 @@ final public class ZKCarousel: UIView,
         let index = visibleIndexPath.item
 
         let indexPathToShow = IndexPath(item: index == slides.count - 1 ? 0 : index + 1, section: 0)
+        self.currentIndex = index
         collectionView.selectItem(at: indexPathToShow,
                                   animated: true,
                                   scrollPosition: .centeredHorizontally)
@@ -172,11 +174,12 @@ final public class ZKCarousel: UIView,
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if let index = currentlyVisibleIndex {
             pageControl.currentPage = index
+            self.currentIndex = index
         }
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        delegate?.carouselDidScroll()
+        delegate?.carouselDidScroll(currentIndex: self.currentIndex)
     }
     
 }
